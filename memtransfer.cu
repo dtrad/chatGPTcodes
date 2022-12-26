@@ -19,14 +19,13 @@ int main() {
   cudaEventCreate(&stop);
 
   // Allocate pinned memory on the host (CPU)
-  float *h_pinned_data;
-  cudaMallocHost((void**)&h_pinned_data, size);
+  float *h_data = (float*) malloc(size);
 
   // Transfer data from the host to the device (GPU)
   float *d_data;
   cudaMalloc((void**)&d_data, size);
-  initarray(h_pinned_data,sizeint);
-  cudaMemcpy(d_data, h_pinned_data, size, cudaMemcpyHostToDevice);
+  initarray(h_data,sizeint);
+  cudaMemcpy(d_data, h_data, size, cudaMemcpyHostToDevice);
 
 
 
@@ -42,11 +41,11 @@ int main() {
 
 
   // Transfer data back from the device to the host
-  cudaMemcpy(h_pinned_data, d_data, size, cudaMemcpyDeviceToHost);
+  cudaMemcpy(h_data, d_data, size, cudaMemcpyDeviceToHost);
 
   // Free device and host memory
   cudaFree(d_data);
-  cudaFreeHost(h_pinned_data);
+  free(h_data);
 
   // Calculate the elapsed time
   float elapsed_time;
