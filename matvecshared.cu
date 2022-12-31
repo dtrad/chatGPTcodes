@@ -23,6 +23,29 @@ __global__ void matvec_kernel(const float* A, const float* x, float* y, int n) {
   // Store the result in global memory
   y[ty] = sum;
 }
+#define BLOCK_SIZE 16
+__global__ void matvec_kernelv2(const float* A, const float* x, float* y, int M, int N) {
+    // Declare shared memory
+    __shared__ float sA[BLOCK_SIZE][BLOCK_SIZE];
+  
+    // Load a block of A into shared memory
+    int i = threadIdx.x;
+    int j = threadIdx.y;
+    sA[i][j] = A[i * N + j];
+  
+    // Wait for all threads to finish loading A
+    __syncthreads();
+  
+    // Compute the matrix-vector product
+    float sum = 0;
+    for (int k = 0; k < N; k++) {
+      sum += sA[i][k] * x[k];
+    }
+  
+    // Store the result in the output array
+    y[i] = sum;
+  }
+  
 
 int main() {
   // Allocate host and device arrays
@@ -44,7 +67,8 @@ int main() {
   // Launch the kernel
   dim3 blockSize(4, 4);
   dim3 gridSize((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
-  matvec_kernel<<<gridSize, blockSize>>>(d_A, d_x, d_y, n);
+  if (0) matvec_kernel<<<gridSize, blockSize>>>(d_A, d_x, d_y, n);
+  else matvec_kernelv2<<<gridSize, blockSize>>>(d_A, d_x, d_y, n, n);
 
   // Copy the result back to the host
   cudaMemcpy(h_y, d_y, n * sizeof(float), cudaMemcpyDeviceToHost);
