@@ -11,30 +11,8 @@ void multiply(float* A, const float* x, float* y, int M, int N){
     return;
 }
 
-__global__ void matvec_kernelv2(const float* A, const float* x, float* y, int M, int N) {
-    // Declare shared memory
-    __shared__ float sA[BLOCK_SIZE][BLOCK_SIZE];
   
-    // Load a block of A into shared memory
-    int i = threadIdx.x;
-    int j = threadIdx.y;
-    sA[i][j] = A[i * N + j];
-  
-    // Wait for all threads to finish loading A
-    __syncthreads();
-  
-    // Compute the matrix-vector product
-    float sum = 0;
-    for (int k = 0; k < N; k++) {
-      sum += sA[i][k] * x[k];
-    }
-  
-    // Store the result in the output array
-    y[i] = sum;
-  }
-  
-
-__global__ void matvec_kernel(float *A, float *x, float *y, int M, int N) {
+  __global__ void matvec_kernelv0(float *A, float *x, float *y, int M, int N) {
     // Determine the thread's row and column within the block
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int col = blockIdx.x * blockDim.x + threadIdx.x;
@@ -57,6 +35,34 @@ __global__ void matvec_kernel(float *A, float *x, float *y, int M, int N) {
     // Store the result in the output vector y
     if (row < M) {
         y[row] = result;
+    }
+}
+__global__ void matvec_kernel(float *A, float *x, float *y, int M, int N) {
+    // Determine the thread's row and column within the block
+    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
+
+    // Allocate shared memory for the block
+    __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
+    __shared__ float xs[BLOCK_SIZE];
+
+    // need a loop here for the different tiles
+    for (int ph=0; ph < N/BLOCK_SIZE; ++ph){
+       // Load the element of A and x into shared memory
+        As[threadIdx.y][threadIdx.x] = (row < M && col < N) ? A[row * N + col] : 0.0f;
+        xs[threadIdx.x] = (col < N) ? x[col] : 0.0f;
+        __syncthreads();
+
+        // Perform the dot product of the row of A and x
+        float result = 0.0f;
+        for (int i = 0; i < blockDim.x; i++) {
+            result += As[threadIdx.y][i] * xs[i];
+        }
+
+        // Store the result in the output vector y
+        if (row < M) {
+            y[row] = result;
+        }
     }
 }
 
