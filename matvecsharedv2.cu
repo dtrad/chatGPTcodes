@@ -28,8 +28,8 @@ __global__ void matvec_kernel(float *A, float *x, float *y, int M, int N) {
         //As[threadIdx.y][threadIdx.x] = A[ph*BLOCK_SIZE + row * N + col];
         //xs[threadIdx.x] = x[ph*BLOCK_SIZE+col];
 
-        As[threadIdx.y][threadIdx.x] = (row < M && col < N) ? A[ph*BLOCK_SIZE + row * N + col] : 0.0f;
-        xs[threadIdx.x] = (col < N) ? x[ph*BLOCK_SIZE+col] : 0.0f; 
+        As[threadIdx.y][threadIdx.x] = (row < M && col < N) ? A[ph*BLOCK_SIZE + row * N + threadIdx.x] : 0.0f;
+        xs[threadIdx.x] = (col < N) ? x[ph*BLOCK_SIZE+threadIdx.x] : 0.0f; 
         __syncthreads();
 
         // Perform the dot product of the row of A and x
@@ -47,8 +47,8 @@ __global__ void matvec_kernel(float *A, float *x, float *y, int M, int N) {
 
 int main() {
     // Allocate host and device arrays
-    const int m = 70;
-    const int n = 32;
+    const int m = 150;
+    const int n = 64;
     float* h_A =(float*) malloc(m*n*sizeof(float));
     float* h_x =(float*) malloc(n*sizeof(float));
     float* h_y  =(float*) malloc(m*sizeof(float));
