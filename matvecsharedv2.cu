@@ -48,14 +48,20 @@ __global__ void matvec_kernel(float *A, float *x, float *y, int M, int N) {
 int main() {
     // Allocate host and device arrays
     const int m = 150;
-    const int n = 64;
+    int n = 65;
+    int nbsize=BLOCK_SIZE;
+    int norig=n;
+    while (n%nbsize) n++;
+    cout << "n=" << n << endl;
     float* h_A =(float*) malloc(m*n*sizeof(float));
     float* h_x =(float*) malloc(n*sizeof(float));
     float* h_y  =(float*) malloc(m*sizeof(float));
     float* h_y2 =(float*) malloc(m*sizeof(float));
 
-    for (int i=0;i<m;i++) for (int j=0;j<n;j++) h_A[i*n+j]=i+j;
-    for (int i=0;i<n;i++) h_x[i]=i;
+    for (int i=0;i<m;i++) for (int j=0;j<n;j++) h_A[i*n+j]=0;
+    for (int i=0;i<m;i++) for (int j=0;j<norig;j++) h_A[i*n+j]=i+j;
+    for (int i=0;i<n;i++) h_x[i]=0;    
+    for (int i=0;i<norig;i++) h_x[i]=i;
     for (int i=0;i<m;i++) h_y[i]=0;
     for (int i=0;i<m;i++) h_y2[i]=0;
     multiply(h_A, h_x, h_y, m, n);
