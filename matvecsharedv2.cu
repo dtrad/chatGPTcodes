@@ -62,8 +62,8 @@ int main() {
     cudaEventCreate(&stop);
 
     // Allocate host and device arrays
-    const int m = 150;
-    int n = 67;
+    const int m = 450;
+    int n = 367;
     int nbsize=BLOCK_SIZE;
     int norig=n;
     while (n%nbsize) n++;
