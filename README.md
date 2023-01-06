@@ -14,6 +14,11 @@ In most cases, some minor (or major) editing had to be done after the code was g
 More importantly, in some cases for cuda, the output from the transformer was wrong on concept. 
 For that I created a version with "wrong" and the end, and the correct solution (edited) without "wrong"
 
+Some examples where made with the purpose of understanding, others where made as lectures to be used in a machine learning class. In general, most examples would not be good for a research project. At least not without a serious editing. However, understanding is the first step in research. 
+
+Examples are in different languajes and topics to test and illustrate the flexibility of the tool.
+In less used languages there is more editing involved (for example, cuda required more editing than python of c++). 
+
 
 
 
