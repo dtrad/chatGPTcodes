@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cuda_runtime.h>
-#define BLOCK_SIZE 8
+#define BLOCK_SIZE 32
 using namespace std;
 void multiply(float* A, const float* x, float* y, int M, int N){
     for (int i = 0; i < M; ++i) {
@@ -21,6 +21,15 @@ __global__ void matvec_kernelGlobal(float* A, float* x, float* y, int M, int N) 
         y[row] = sum;
     }
 }
+
+__global__ void matvec_kernelGlobal2(float* A, float* x, float* y, int M, int N) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    int j = blockIdx.y * blockDim.y + threadIdx.y;
+    if (i < M && j < N) {
+      y[i] = A[i * N + j] * x[j];  // needs atomic
+    }
+}
+  
  
 __global__ void matvec_kernel(float *A, float *x, float *y, int M, int N) {
     // Determine the thread's row and column within the block
@@ -63,7 +72,7 @@ int main() {
 
     // Allocate host and device arrays
     const int m = 450;
-    int n = 367;
+    int n = 467;
     int nbsize=BLOCK_SIZE;
     int norig=n;
     while (n%nbsize) n++;
@@ -106,14 +115,17 @@ int main() {
     cudaMemcpy(d_A, h_A, m * n * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_x, h_x, n * sizeof(float), cudaMemcpyHostToDevice);
     bool global=false;
+    dim3 blockSize;
+    dim3 gridSize;
+    blockSize.x=BLOCK_SIZE;
     if (global){
-        dim3 blockSize(BLOCK_SIZE, 1, 1);
-        dim3 gridSize((m + blockSize.x - 1) / blockSize.x, 1, 1);
+        gridSize.x=(m + blockSize.x - 1) / blockSize.x;
         matvec_kernelGlobal<<< gridSize, blockSize >>>(d_A, d_x, d_y, m, n);      
     }
     else{
-        dim3 blockSize(BLOCK_SIZE, BLOCK_SIZE);
-        dim3 gridSize((n + blockSize.x - 1) / blockSize.x, (m + blockSize.y - 1) / blockSize.y);
+        blockSize.y=BLOCK_SIZE;
+        gridSize.x=(n + blockSize.x - 1) / blockSize.x;
+        gridSize.y=(m + blockSize.y - 1) / blockSize.y;
         matvec_kernel<<< gridSize, blockSize >>>(d_A, d_x, d_y, m, n);
     }
     
@@ -131,8 +143,8 @@ int main() {
         for (int i = 0; i < m; i++) std::cout << h_y2[i] << " ";
         std::cout << std::endl;
     }
-    //std::cout << "<<< (" << gridSize.x << ", " << gridSize.y << ")" ;
-    //std::cout << ",(" << blockSize.x << ", " << blockSize.y << ")" << ">>> " << std::endl;
+    std::cout << "<<< (" << gridSize.x << ", " << gridSize.y << ")" ;
+    std::cout << ",(" << blockSize.x << ", " << blockSize.y << ")" << ">>> " << std::endl;
       
     // difference
     float diff=0;
