@@ -3,3 +3,5 @@ project(myproject CXX)
 add_executable(myproject multiply.cpp)
 find_package(Boost REQUIRED)
 target_link_libraries(myproject Boost::boost)
+set(CMAKE_CXX_COMPILER /opt/rh/devtoolset-8/root/usr/bin/g++)
+

@@ -1,0 +1,11 @@
+CC = g++
+CFLAGS = -Wall -std=c++11 -I/home/dtrad/opencv-3.3.0/include/opencv2/
+OPENCV = `pkg-config opencv --cflags --libs`
+
+all: main
+
+main: main.cpp
+	$(CC) $(CFLAGS) -o main main.cpp $(OPENCV)
+
+clean:
+	rm -f main
