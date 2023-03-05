@@ -7,7 +7,7 @@ Mat matchFilter(Mat img, Mat templ) {
 }
 
 
-void main(){}
+int main(){
 
     Mat img = imread("image.jpg", IMREAD_GRAYSCALE);
     Mat templ = imread("template.jpg", IMREAD_GRAYSCALE);
@@ -19,7 +19,7 @@ void main(){}
 
 
 
-return 0;
+    return 0;
 
 
 
