@@ -4,6 +4,8 @@
 // CUDA kernel for vector addition
 // compile with nvcc -o mpicuda mpicuda.cu -lcudart -lmpi
 // run with mpirun -np 2 mpicuda 
+// on some system may need to include the directories shown by
+// mpic++ --show-me
 
 __global__ void vectorAdd(int* a, int* b, int* c, int size) {
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
