@@ -1,0 +1,21 @@
+# Makefile to compile LaTeX document with BibTeX
+
+# Name of the main LaTeX file (without extension)
+MAIN = convertbib
+BIB = mybib
+# Target to compile the LaTeX document
+all: $(MAIN).pdf
+
+# Rule to generate the PDF from the LaTeX file
+$(MAIN).pdf: $(MAIN).tex $(BIB).bib
+	pdflatex $(MAIN).tex
+	bibtex $(MAIN).aux
+	pdflatex $(MAIN).tex
+	pdflatex $(MAIN).tex
+
+# Clean up auxiliary files generated during the build process
+clean:
+	rm -f $(MAIN).aux $(MAIN).bbl $(MAIN).blg $(MAIN).log $(MAIN).out $(MAIN).pdf
+
+# Phony targets
+.PHONY: all clean

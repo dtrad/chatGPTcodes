@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BibTeX to Citation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .citation {
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>BibTeX to Citation</h1>
+    <p>Copy and paste your BibTeX entry below:</p>
+    <textarea id="bibtexInput" rows="10" cols="80"></textarea>
+    <br><br>
+    <button onclick="convertBibTeX()">Convert to Citation</button>
+
+    <div id="output" class="citation"></div>
+
+    <script>
+        function convertBibTeX() {
+            const bibtex = document.getElementById('bibtexInput').value;
+            const citation = formatCitation(bibtex);
+            document.getElementById('output').innerHTML = citation;
+        }
+
+        function formatCitation(bibtex) {
+            const titleMatch = /title=\{([^}]+)\}/.exec(bibtex);
+            const authorMatch = /author=\{([^}]+)\}/.exec(bibtex);
+            const journalMatch = /journal=\{([^}]+)\}/.exec(bibtex);
+            const volumeMatch = /volume=\{([^}]+)\}/.exec(bibtex);
+            const numberMatch = /number=\{([^}]+)\}/.exec(bibtex);
+            const pagesMatch = /pages=\{([^}]+)\}/.exec(bibtex);
+            const yearMatch = /year=\{([^}]+)\}/.exec(bibtex);
+            const publisherMatch = /publisher=\{([^}]+)\}/.exec(bibtex);
+
+            const title = titleMatch ? titleMatch[1] : '';
+            const author = authorMatch ? authorMatch[1].replace(/ and /g, ', ') : '';
+            const journal = journalMatch ? journalMatch[1] : '';
+            const volume = volumeMatch ? volumeMatch[1] : '';
+            const number = numberMatch ? numberMatch[1] : '';
+            const pages = pagesMatch ? pagesMatch[1] : '';
+            const year = yearMatch ? yearMatch[1] : '';
+            const publisher = publisherMatch ? publisherMatch[1] : '';
+
+            return `${author}. (${year}). ${title}. <i>${journal}</i>, ${volume}(${number}), ${pages}. ${publisher}.`;
+        }
+    </script>
+</body>
+</html>
