@@ -1,0 +1,11 @@
+Primary waves have one reflection in its travel path, whereas multiple waves have
+undergone more than one reflection between source and receiver (Sengbush, 2012).
+Multiples can be divided into two general types: surface and internal multiples. Surface
+multiples can be extracted and used for marine data because their amplitudes are
+strong and can easily overwhelm the internal multiples. As for internal multiples, they
+could be a good target for processing land data, precisely for the presence of high- and
+low-velocity layers.
+Migration is a process that re-locates the seismic events to the true space or time lo-
+cation. Because multiple energy can penetrate some subsurface targets where primaries
+are weakly focused, migration of multiples is a helpful tool adding to the illumination
+of the subsurface.
