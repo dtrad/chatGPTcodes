@@ -1,0 +1,9 @@
+target: testassembly
+testassembly: testassembly.o
+    gcc -o testassembly testassembly.o
+testassembly.o: testassembly.s
+testassembly.s: testassembly.c
+    gcc -S testassembly.c
+testassembly.c: testassembly.c
+clean:
+    rm testassembly testassembly.o testassembly.s
